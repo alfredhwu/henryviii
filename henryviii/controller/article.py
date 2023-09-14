@@ -36,6 +36,7 @@ def get_followed_off_account_list():
     return oa_list
 
 @bp.route('/sync')
+@login_required
 def sync():
     db = get_db()
     xlsxname = "./sync/news_list_dw.xlsx"
@@ -130,6 +131,7 @@ def sync():
 #     return None
 
 @bp.route('/', methods=('GET', 'POST'))
+@login_required
 def index():
     db = get_db()
 
