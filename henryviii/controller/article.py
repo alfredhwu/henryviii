@@ -142,8 +142,8 @@ def index():
     off_account_list = []
     for oa in db.execute(
         'SELECT oal.name, oal.category'
-        ' FROM off_account_list oal'
-        ' RIGHT JOIN off_account_followed oaf'
+        ' FROM off_account_followed oaf'
+        ' LEFT JOIN off_account_list oal'
         ' ON oal.name = oaf.off_account_name'
         ' WHERE oaf.username = "' + g.user["username"] + '"'
         ).fetchall():
