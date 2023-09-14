@@ -1,5 +1,5 @@
 [project]
-name = "henry-viii"
+name = "henryviii"
 version = "1.0.0"
 description = "The service from Henry VIII."
 dependencies = [
