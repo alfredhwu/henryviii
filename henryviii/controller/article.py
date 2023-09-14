@@ -3,8 +3,8 @@ from flask import (
 )
 from werkzeug.exceptions import abort
 
-from flaskr.auth import login_required
-from flaskr.db import get_db
+from henryviii.controller.auth import login_required
+from henryviii.db import get_db
 
 # import xlrd
 from openpyxl import Workbook, load_workbook
