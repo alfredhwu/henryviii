@@ -24,7 +24,10 @@
               <a class="nav-link" href="/off-account">公号管理</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/sync">刷新</a>
+              <a class="nav-link" href="/admin/sync">同步</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin">系统管理</a>
             </li>
 <!--             <li class="nav-item">
               <a class="nav-link" href="#">Link</a>
@@ -45,7 +48,7 @@
             </li> -->
           {% if g.user %}
             <li class="nav-item">
-              <a class="nav-link active" href="#">{{ g.user['username'] }}</a>
+              <a class="nav-link active" href="/account"><i class="bi bi-person"></i>{{ g.user['username'] }}</a>
             </li>
             <li class="nav-item">
               <a class="nav-link active" href="{{ url_for('auth.logout') }}">Log Out</a>

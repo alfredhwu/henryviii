@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block header %}
+      <h1>{% block title %}账户管理{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+      <div class="col-lg-8 px-0">
+        这里是账户管理
+        <a href="/auth/password/reset">重置密码</a>
+        <br>
+      </div>
+{% endblock %}

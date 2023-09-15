@@ -2,6 +2,9 @@ import os
 
 from flask import Flask
 
+def create_dir_if_not_exist(dir_path):
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
 
 def create_app(test_config=None):
     # create and configure the app
@@ -9,6 +12,8 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+        UPLOAD_FOLDER=os.path.join(app.instance_path, 'upload'),
+        DELETE_AFTER_SYNC=True
     )
 
     if test_config is None:
@@ -20,8 +25,10 @@ def create_app(test_config=None):
 
     # ensure the instance folder exists
     try:
-        os.makedirs(app.instance_path)
-    except OSError:
+        create_dir_if_not_exist(app.instance_path)
+        create_dir_if_not_exist(app.config["UPLOAD_FOLDER"])
+    except OSError as e:
+        app.logger.error(f"Error: {e}")
         pass
 
     # a simple page that says hello
@@ -32,15 +39,13 @@ def create_app(test_config=None):
     from . import db
     db.init_app(app)
 
-    from .controller import auth
-    app.register_blueprint(auth.bp)
-
-    from .controller import article
-    app.register_blueprint(article.bp)
-    app.add_url_rule('/', endpoint='index')
-
-    from .controller import off_account
+    from .controller import auth, account, admin, article, off_account
+    app.register_blueprint(auth.bp, url_prefix='/auth')
+    app.register_blueprint(account.bp, url_prefix='/account')
+    app.register_blueprint(admin.bp, url_prefix='/admin')
     app.register_blueprint(off_account.bp, url_prefix='/off-account')
+    app.register_blueprint(article.bp)
+
     app.add_url_rule('/', endpoint='index')
 
     return app
