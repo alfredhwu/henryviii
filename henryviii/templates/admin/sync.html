@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block header %}
+      <h1>{% block title %}系统管理 - 数据上传同步{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+      <div class="col-lg-8 px-0">
+        <form method="POST" enctype="multipart/form-data">
+            <label>上传数据文件</label><input type="file" name="upload-file">
+            <input type="submit" name="submit" value="上传并同步">
+        </form>
+      </div>
+{% endblock %}

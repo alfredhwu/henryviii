@@ -1,5 +1,7 @@
 import functools
 
+import random, string
+
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
@@ -7,7 +9,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from henryviii.db import get_db
 
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+bp = Blueprint('auth', __name__)
 
 
 @bp.before_app_request
@@ -90,3 +92,43 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
+@bp.route('/password/change')
+def change_password():
+    return render_template('auth/change_password.html')
+
+
+@bp.route('/password/reset')
+@login_required
+def reset_password():
+    # get current username
+    username = g.user["username"]
+
+    # get random password pf length 8 with letters, digits, and symbols
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(8))
+    flash("password reset to: [" + password + "], please keep it safe or change it ASAP ;p")
+
+
+    # update password
+    db = get_db()
+    error = None
+    if not username:
+        error = 'Username is required.'
+    elif not password:
+        error = 'Password is required.'
+
+    flash("username: " + username)
+    if error is None:
+        try:
+            db.execute(
+                f'UPDATE user SET password = \"{generate_password_hash(password)}\" WHERE username = \"{username}\"'
+            )
+            db.commit()
+        except db.IntegrityError:
+            error = f"Failed reset password for {username}."
+        else:
+            return redirect(url_for("auth.login"))
+
+
+
+    return render_template('auth/reset_password.html')
