@@ -23,15 +23,18 @@
       <div class="col-lg-12 px-0">
         <h3>用户的公号分类</h3>
         <div>
-        {% for uc in user_categories %}
+        {% for user_category in user_category_with_off_accounts %}
         <div class="btn-group">
-          <span class="btn btn-sm disabled">{{ uc }}</span>
-          <button class="btn btn-sm btn-outline-danger">删除</button>
-          <button class="btn btn-sm btn-outline-info">重命名
+          <span class="btn btn-sm disabled">{% if "__default__" == user_category %}其他{% else %}{{ user_category }}{% endif %}</span>
+          {% if not "__default__" == user_category %}
+          <button class="btn btn-sm btn-outline-danger user-category-delete" for={{ user_category }}>删除</button>
+          <button class="btn btn-sm btn-outline-info user-category-rename">重命名</button>
+          {% endif %}
         </div>
+        <span>{% for off_account_id, off_account_name in user_category_with_off_accounts[user_category] %}{{off_account_name}}{% if not loop.last %}|{% endif %}{% endfor %}</span>
         <br>
         {% endfor %}
-        <div><input type="text"><button class="btn btn-sm btn-success">新增分类</button></div>
+        <div><input type="text" id="new-user-category"><button class="btn btn-sm btn-success user-category-add" for="new-user-category">新增分类</button></div>
         </div>
       </div>
       <hr>
@@ -49,8 +52,10 @@
               {% endif %}
             </button>
             <ul class="dropdown-menu">
-              {% for uc in user_categories %}
-              <li><a class="dropdown-item off-account-user-category-select" oaid="{{ off_account_id }}" oacat="{{ uc }}" type="button" href="#">{{ uc }}</a></li>
+              {% for user_category in user_category_with_off_accounts %}
+                {% if not "__default__" == user_category %}
+              <li><a class="dropdown-item off-account-user-category-select" oaid="{{ off_account_id }}" oacat="{{ user_category }}" type="button" href="#">{{ user_category }}</a></li>
+                {% endif %}
               {% endfor %}
             </ul>
           </span>
@@ -63,6 +68,57 @@
 {% block extension_for_js %}
     <script type="text/javascript">
       $(document).ready(function(){
+        /* add action for user category definition */
+        // delete user category
+        $(".user-category-delete").click(function(e) {
+          e.preventDefault();
+          // get user category
+          var user_category_tobe_delete = $(this).attr("for").trim()
+          if (user_category_tobe_delete.length > 0) {
+            var call_link = "/user-category/service/delete";
+            $.ajax({
+              url: call_link,
+              type: "POST",
+              data: JSON.stringify({
+                "user_category": user_category_tobe_delete
+              }),
+              contentType: "application/json; charset=utf-8",
+              success: function(data, status) {
+                // alert(JSON.stringify(data))
+                location.reload()
+              }
+            })
+          }
+        })
+
+        // add user category
+        $(".user-category-add").click(function(e) {
+          e.preventDefault();
+          // get user category
+          var new_user_category = $("#" + $(this).attr("for")).val().trim()
+          // alert(new_user_category);
+          // call api to perform the add action
+          if (new_user_category.length > 0) {
+            var call_link = "/user-category/service/add";
+            $.ajax({
+              url: call_link,
+              type: "POST",
+              data: JSON.stringify({
+                "user_category": new_user_category
+              }),
+              contentType: "application/json; charset=utf-8",
+              success: function(data, status) {
+                // 
+                // alert(JSON.stringify(data))
+                location.reload()
+              }
+            })
+          }
+        })
+
+        // rename user category
+
+        /* add action for user category selection */
         $(".off-account-user-category-select").click(function(e) {
           e.preventDefault();
           var oaid = $(this).attr('oaid');
@@ -78,6 +134,7 @@
             success: function(data, status) {
                 // call back
               $("#user-category-" + oaid).text(new_user_category);
+              location.reload()
             }
           })
         });

@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, url_for
 
 def create_dir_if_not_exist(dir_path):
     if not os.path.exists(dir_path):
@@ -39,11 +39,14 @@ def create_app(test_config=None):
     from . import db
     db.init_app(app)
 
-    from .controller import auth, account, admin, article, off_account
+    from .controller import auth, account, admin, article, off_account, user_category
+
+
     app.register_blueprint(auth.bp, url_prefix='/auth')
     app.register_blueprint(account.bp, url_prefix='/account')
     app.register_blueprint(admin.bp, url_prefix='/admin')
     app.register_blueprint(off_account.bp, url_prefix='/off-account')
+    app.register_blueprint(user_category.bp, url_prefix='/user-category')
     app.register_blueprint(article.bp)
 
     app.add_url_rule('/', endpoint='index')

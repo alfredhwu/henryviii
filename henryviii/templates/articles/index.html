@@ -9,8 +9,8 @@
         <form method="POST" id="form-filter">
           分类筛选<br>
           {% for category in off_account_dict %}
-          <input type="checkbox" class="category-group" name="{{ category }}" {% if category in category_selected %} checked="checked"{% endif %}><label>{{ category }}: </label>
-            <span>{{ '|'.join(off_account_dict[category]) }}</span>
+          <input type="checkbox" class="category-group" name="{{ category }}" {% if category in filter_user_category %} checked="checked"{% endif %}><label>{% if "__default__" == category%}其他{% else %}{{ category }}{% endif %}: </label>
+            <span>{% for off_account_id, off_account_name in off_account_dict[category] %}{{off_account_name}}{% if not loop.last %}|{% endif %}{% endfor %}</span>
             <br>
           {% endfor %}
 
@@ -40,7 +40,7 @@
             <tr>
               <td id="icon-for-{{ article['id'] }}">{% if article['viewed_at'] %}<i class="bi bi-envelope-paper"></i>{% else %}<i class="bi bi-envelope-fill"></i>{% endif %}</td>
               <td>{{ article['off_account_name'] }}</td>
-              <td>{{ article['category'] }}</td>
+              <td>{% if article['user_category'] %}{{ article['user_category'] }}{% else %}其他{% endif %}</td>
               <td>{{ article['updated_at'] }}</td>
               <td><a href="#" link="{{ article['link'] }}" class="off_account_article {% if article['viewed_at'] %}viewed{% endif %}" aid="{{ article['id'] }}">{{ article['title'] }}</a></td>
               <td>
