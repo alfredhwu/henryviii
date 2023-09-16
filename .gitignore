@@ -5,6 +5,7 @@ __pycache__/
 
 instance/
 sync/
+logs/
 
 .DS_Store
 .pytest_cache/
