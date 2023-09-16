@@ -35,12 +35,6 @@ def get_followed_off_account_list():
         oa_list.append(row["off_account_name"])
     return oa_list
 
-@bp.route('/sync')
-@login_required
-def sync():
-
-    return redirect(url_for("index"))
-
 # def get_form_value(form_key):
 #     if request.form.get(form_key):
 #         return request.form.get(form_key)
@@ -60,10 +54,10 @@ def index():
     off_account_list = []
     for oa in db.execute(
         'SELECT oal.name, oal.category'
-        ' FROM off_account_followed oaf'
+        ' FROM off_account_user_meta oaum'
         ' LEFT JOIN off_account_list oal'
-        ' ON oal.name = oaf.off_account_name'
-        ' WHERE oaf.username = "' + g.user["username"] + '"'
+        ' ON oal.name = oaum.off_account_name'
+        ' WHERE oaum.username = "' + g.user["username"] + '"'
         ).fetchall():
         current_category = oa["category"]
         current_account_name = oa["name"]

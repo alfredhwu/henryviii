@@ -1,19 +1,86 @@
 {% extends 'base.html' %}
 
 {% block header %}
-      <h1>{% block title %}关注的公号{% endblock %}</h1>
+      <h2>{% block title %}公号跟踪管理{% endblock %}</h2>
+      <hr>
 {% endblock %}
 
 {% block content %}
-      <div class="col-lg-8 px-0">
-        <form method="post">
-          {% for oa in off_accounts %}
-          <label for="{{ oa['name'] }}">{{ oa['name']}}</label>
-          <input type="checkbox" name="{{ oa['name'] }}"{% if oa['name'] in followed %} checked="checked"{% endif %}>
+      <div class="col-lg-12 px-0">
+        <h3>跟踪的公号</h3>
+        <form method="post" name="form-off-account-followed">
+          {% for off_account_name in off_accounts %}
+          <label for="{{ off_account_name }}">{{ off_account_name }}</label>
+          <input type="checkbox" name="{{ off_account_name }}"{% if off_account_name in followed %} checked="checked"{% endif %}>
           <span>||</span>
           {% endfor %}
           <br>
           <input type="submit" name="submit" value="更新">
         </form>
       </div>
+      <hr>
+
+      <div class="col-lg-12 px-0">
+        <h3>用户的公号分类</h3>
+        <div>
+        {% for uc in user_categories %}
+        <div class="btn-group">
+          <span class="btn btn-sm disabled">{{ uc }}</span>
+          <button class="btn btn-sm btn-outline-danger">删除</button>
+          <button class="btn btn-sm btn-outline-info">重命名
+        </div>
+        <br>
+        {% endfor %}
+        <div><input type="text"><button class="btn btn-sm btn-success">新增分类</button></div>
+        </div>
+      </div>
+      <hr>
+
+      <div class="col-lg-12 px-0">
+        <h3>为公号进行分类</h3>
+        {% for (off_account, off_account_id, user_category) in off_account_user_category_list %}
+        <span>|</span>
+        <span class="col-lg-1">
+          <span class="btn btn-sm">{{ off_account }}</span>
+          <span class="btn-group">
+            <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="user-category-{{off_account_id}}">
+              {% if user_category %}{{ user_category }}
+              {% else %}未分类
+              {% endif %}
+            </button>
+            <ul class="dropdown-menu">
+              {% for uc in user_categories %}
+              <li><a class="dropdown-item off-account-user-category-select" oaid="{{ off_account_id }}" oacat="{{ uc }}" type="button" href="#">{{ uc }}</a></li>
+              {% endfor %}
+            </ul>
+          </span>
+        </span>
+        <span>|</span>
+        {% endfor %}
+      </span>
+{% endblock %}
+
+{% block extension_for_js %}
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $(".off-account-user-category-select").click(function(e) {
+          e.preventDefault();
+          var oaid = $(this).attr('oaid');
+          var new_user_category = $(this).attr('oacat');
+          var call_link = "/off-account/" + oaid + "/user-category";
+          $.ajax({
+            url: call_link,
+            type: "POST",
+            data: JSON.stringify({
+              "new_user_category": new_user_category
+            }),
+            contentType: "application/json; charset=utf-8",
+            success: function(data, status) {
+                // call back
+              $("#user-category-" + oaid).text(new_user_category);
+            }
+          })
+        });
+    });
+    </script>
 {% endblock %}
