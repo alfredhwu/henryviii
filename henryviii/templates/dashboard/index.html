@@ -75,6 +75,9 @@
 {% endblock %}
 {% block extension_for_js %}
     <script type="text/javascript">
+      /* 
+        Scroll Paging Function
+      */
       $(document).on('scroll', function() {
         var scrollPos = $(window).scrollTop(); // position of window relative to the top
         var document_height = $(document).height(); // height of the whole html document (visible or not)
@@ -97,9 +100,19 @@
         }
       })
       $(document).ready(function(){
+        /*
+          刷新页面
+        */
         $("#filter-submit").click(function (e) {
           // get current filter values
           // get user_category filter
+          user_category_list = [];
+          $(".category-group").each(function (i, e) {
+            if ($(this).is(":checked")) {
+              user_category_list.push(e.name.trim());
+            }
+          })
+          user_category = user_category_list.join('|')
           // get view_status filter
           view_status = $("#view-status-target").attr("sel-view-status");
           fav_status = $("#dash-filter-favorite-status").is(':checked') ? 1 : 0;
@@ -107,7 +120,7 @@
           datatime_to = $("#dash-filter-datetime-to").val();
           // construct get parameter
           filterParams = $.param({
-            uc: "",
+            uc: user_category,
             view: view_status,
             fav: fav_status,
             // arc: arc_status,
@@ -118,11 +131,17 @@
           window.location.href = window.location.pathname + "?" + filterParams;
           // go
         });
+        /*
+          选择是否已读
+        */
         $(".view-status-select").click(function (e) {
           e.preventDefault();
           $("#view-status-target").text($(this).text());
           $("#view-status-target").attr("sel-view-status", $(this).attr("view-status"));
         });
+        /*
+          当打开一个文章
+        */
         $("a.off_account_article").click(function(e) {
           e.preventDefault();
           var article_id = $(this).attr("aid");
