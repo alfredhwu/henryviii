@@ -19,30 +19,30 @@ bp = Blueprint('article', __name__)
 def load_logged_in_user():
     g.user = current_user.get_current_user()
 
-@bp.route('/', methods=('GET', 'POST'))
-@login_required
-def index_controller():
-    db = get_db()
+# @bp.route('/', methods=('GET', 'POST'))
+# @login_required
+# def index_controller():
+#     db = get_db()
 
-    # get off_account dictionary
-    off_account_dict = model_off_account_user_category.get_dict_of_user_category_with_following_off_account(g.user["username"])
+#     # get off_account dictionary
+#     off_account_dict = model_off_account_user_category.get_dict_of_user_category_with_following_off_account(g.user["username"])
 
-    # update filter if POST method
-    if request.method == 'POST':
-        category_selected = []
-        for category in off_account_dict:
-            if request.form.get(category):
-                category_selected.append(category)
-    else:
-        category_selected = off_account_dict.keys()
+#     # update filter if POST method
+#     if request.method == 'POST':
+#         category_selected = []
+#         for category in off_account_dict:
+#             if request.form.get(category):
+#                 category_selected.append(category)
+#     else:
+#         category_selected = off_account_dict.keys()
 
-    filter_user_category = category_selected
-    articles = model_article.get_all_article_with_user_category(g.user["username"], filter_user_category, 10)
+#     filter_user_category = category_selected
+#     articles = model_article.get_all_article_with_user_category(g.user["username"], filter_user_category, 50)
 
-    return render_template('articles/index.html', 
-        off_account_dict=off_account_dict, 
-        filter_user_category=filter_user_category,  # filter category
-        articles=articles)
+#     return render_template('articles/index.html', 
+#         off_account_dict=off_account_dict, 
+#         filter_user_category=filter_user_category,  # filter category
+#         articles=articles)
 
 @bp.route('/article/<int:id>/view', methods=['POST'])
 @login_required

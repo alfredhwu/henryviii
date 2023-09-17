@@ -57,6 +57,16 @@
 {% endblock %}
 {% block extension_for_js %}
     <script type="text/javascript">
+      $(document).on('scroll', function() {
+        var scrollPos = $(window).scrollTop(); // position of window relative to the top
+        var document_height = $(document).height(); // height of the whole html document (visible or not)
+        var window_height = $(window).height(); // height of the browser window (visible); need to set <!DOCTYPE html> at top of the page, otherwise not working
+        // msg = "scrollPos: " + scrollPos + "\ndocument height:" + document_height + "\n window height: " + window_height
+        // $(".off_account_article").text(msg)
+        if (scrollPos == document_height - window_height) {
+          alert("bottom touched, loading more content !!")
+        }
+      })
       $(document).ready(function(){
         $("a.off_account_article").click(function(e) {
           e.preventDefault();

@@ -10,6 +10,17 @@ from henryviii.db import get_db
 __DEFAULT_USER_CATEGORY__ = "__default__"
 __META_KEY_FOR_USER_CATEGORY__ = "user_category"
 
+def get_user_category_list_from_string(user_category_string):
+	user_category_list =[]
+	for user_category in user_category_string.split('|'):
+		ucs = user_category.strip()
+		if len(ucs) > 0:
+			user_category_list.append(ucs)
+	return user_category_list
+
+def get_user_category_string_from_list(user_category_list):
+	return "" if user_category_list is None else '|'.join(user_category_list)
+
 
 def create_or_update_user_meta_for_user_category(username, new_user_category_list):
 	db = get_db()

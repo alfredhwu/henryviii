@@ -1,0 +1,15 @@
+          {% for article in articles %}
+            <tr>
+              <td id="icon-for-{{ article['id'] }}">{% if article['viewed_at'] %}<i class="bi bi-envelope-paper"></i>{% else %}<i class="bi bi-envelope-fill"></i>{% endif %}</td>
+              <td>{{ article['off_account_name'] }}</td>
+              <td>{% if article['user_category'] %}{{ article['user_category'] }}{% else %}其他{% endif %}</td>
+              <td>{{ article['updated_at'] }}</td>
+              <td><a href="#" link="{{ article['link'] }}" class="off_account_article {% if article['viewed_at'] %}viewed{% endif %}" aid="{{ article['id'] }}">{{ article['title'] }}</a></td>
+              <td>
+                <input type="checkbox">
+              </td>
+              <td>
+                <a href="#"><i class="bi bi-trash"></i></a>
+              </td>
+            </tr>
+          {% endfor %}
