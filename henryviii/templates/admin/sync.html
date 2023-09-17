@@ -11,4 +11,14 @@
             <input type="submit" name="submit" value="上传并同步">
         </form>
       </div>
+      <hr>
+      <table>
+        <tbody>
+            {% for off_account in off_accounts %}
+            <tr>
+                  <td>{{ off_account["name"] }}</td><td>{{ off_account["article_updated_at"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
 {% endblock %}

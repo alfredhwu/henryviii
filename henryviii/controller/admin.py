@@ -22,6 +22,7 @@ def admin():
 ## HERE PROCESS DATA SYNC
 
 ALLOWED_EXTENSIONS = set(['xlsx'])
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
@@ -31,6 +32,7 @@ def sync_file_to_db(filepath):
 
     ## sync off_account list
     ## 公众号|分类|是否更新|更新时间|更新文章|备注|登记时间
+
     ## first get last sync off_account timestamp
     last_off_account = db.execute(
         'SELECT registered_at FROM off_account_list'
@@ -42,28 +44,44 @@ def sync_file_to_db(filepath):
     else:
         last_off_account_timestamp = int(last_off_account["registered_at"])
 
-    off_accounts_names = []
-    for row in db.execute('SELECT name FROM off_account_list').fetchall():
-        off_accounts_names.append(row["name"])
+    ## get list of all off_account
+    off_accounts_names = {}
+    for row in db.execute('SELECT name, article_updated_at FROM off_account_list').fetchall():
+        off_accounts_names[row["name"]]=row["article_updated_at"]
 
+    ## iterate uploded file
     for index, row in pd.read_excel(xlsxname, sheet_name="list").iterrows():
-        current_registered_at = int(row["登记时间"])
+        current_registered_at = int(row["登记时间"]) ## timestamp to check
         current_name = row["公众号"].strip()
         if isinstance(row["更新时间"], pd.Timestamp):
-            current_updated_at = row["更新时间"].strftime('%Y-%m-%d %X')
+            # current_updated_at = row["更新时间"].strftime('%Y-%m-%d %X')
+            current_updated_at = row["更新时间"]
         else:
             current_updated_at = None
-        current_category = row["分类"].strip()
-        if current_registered_at < last_off_account_timestamp or current_name in off_accounts_names:
+
+        current_category = row["分类"]
+        ## if registered before or already in the list
+        # if current_registered_at < last_off_account_timestamp or current_name in off_accounts_names:
+        if current_name in off_accounts_names:
+            ## here can update the update time
+            if current_updated_at:
+                if not off_accounts_names[current_name] or current_updated_at > pd.Timestamp(off_accounts_names[current_name]):
+                    ## update
+                    current_app.logger.info(current_name + ":" + current_updated_at.strftime('%Y-%m-%d %X'))
+                    db.execute(
+                        'UPDATE off_account_list'
+                        ' SET article_updated_at = ?'
+                        ' WHERE name = ?',
+                        (current_updated_at.strftime('%Y-%m-%d %X'), current_name))
             continue
 
         ## insert the new off account to the DB
         db.execute(
             'INSERT INTO off_account_list (name, category, article_updated_at, registered_at)'
             ' VALUES (?, ?, ?, ?)',
-            (current_name, current_category, current_updated_at, current_registered_at)
+            (current_name, current_category, current_updated_at.strftime('%Y-%m-%d %X'), current_registered_at)
         )
-        off_accounts_names.append(current_name)
+        off_accounts_names[current_name] = current_updated_at
     db.commit()
 
     ## sync off_account articles
@@ -137,7 +155,13 @@ def sync():
         else:
             # wrong file
             flash(f"{file.filename} not allowed")
-    return render_template('admin/sync.html')
+
+    ## list all off_account with syncing status
+
+    off_accounts = get_db().execute(
+        'SELECT * FROM off_account_list ORDER BY article_updated_at DESC')
+
+    return render_template('admin/sync.html', off_accounts=off_accounts)
 
 
 
