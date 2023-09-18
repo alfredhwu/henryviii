@@ -93,7 +93,7 @@
           const queryString = window.location.search;
           call_link = "/more/article/" + scroll_page_size + '/' + scroll_page + queryString;
           $.get(call_link, function(data, status) {
-            alert(data);
+            // alert(data);
             article_container.append(data);
             article_container.attr("scroll-page", scroll_page)
           })
