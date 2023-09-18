@@ -1,44 +1,14 @@
 {% extends 'base.html' %}
 
 {% block header %}
-      <h1>{% block title %}最新文章{% endblock %}</h1>
+      <h2>{% block title %}公号跟踪管理{% endblock %}</h2>
+      <hr>
 {% endblock %}
 
 {% block content %}
+
       <hr>
-      <div class="dash-filter">
-        <div class="dash-filter-user-category">
-          {% for category in off_account_dict %}
-          <input type="checkbox" class="category-group" name="{{ category }}" {% if not dash_filter["user_category"] or category in dash_filter["user_category"] %} checked="checked"{% endif %}><label>{% if "__default__" == category%}其他{% else %}{{ category }}{% endif %}: </label>
-            <span>{% for off_account_id, off_account_name in off_account_dict[category] %}{{off_account_name}}{% if not loop.last %}|{% endif %}{% endfor %}</span>
-            <br>
-          {% endfor %}
-        </div>
-        <div class="dash-filter-status"> 
-          <span class="col-lg-1">
-            状态：
-            <span class="btn-group">
-              <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="view-status-target" sel-view-status="{{ dash_filter["view_status"] }}">{{ status_map["view"][dash_filter["view_status"]] }}
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item view-status-select" type="button" href="#" view-status=0>全部</a></li>
-                <li><a class="dropdown-item view-status-select" type="button" href="#" view-status=2>未读</a></li>
-                <li><a class="dropdown-item view-status-select" type="button" href="#" view-status=1>已读</a></li>
-              </ul>
-            </span>
-          </span>
-          <span class="col-lg-1">
-            <input type="checkbox" {% if dash_filter["favorite_status"] == 1%}checked="checked"{% endif %} id="dash-filter-favorite-status">仅收藏
-          </span>
-          <span class="col-lg-1">
-            从：<input type="date" value="{{ dash_filter["date_from"].strftime('%Y-%m-%d') }}" id="dash-filter-datetime-from">
-            到：<input type="date"  value="{{ dash_filter["date_to"].strftime('%Y-%m-%d') }}" id="dash-filter-datetime-to">
-          </span>
-          <a class="btn btn-sm btn-primary" id="filter-submit">刷新</a>
-          <a class="btn btn-sm btn-info">保存配置</a>
-        </div>
-      </div>
-      <hr>
+
       <div class="col-lg-12 px-0">
         <table class="table table-striped table-sm">
           <thead>
@@ -56,7 +26,7 @@
           {% for article in articles %}
             <tr aid="{{ article['id'] }}">
               <td id="icon-for-{{ article['id'] }}">{% if article['viewed_at'] %}<i class="bi bi-envelope-paper"></i>{% else %}<i class="bi bi-envelope-fill"></i>{% endif %}</td>
-              <td><a href="/off-account/{{ article['off_account_id'] }}/show" class="off-account">{{ article['off_account_name'] }}</a></td>
+              <td>{{ article['off_account_name'] }}</td>
               <td>{% if article['user_category'] %}{{ article['user_category'] }}{% else %}其他{% endif %}</td>
               <td>{{ article['updated_at'] }}</td>
               <td><a href="#" link="{{ article['link'] }}" class="off-account-article {% if article['viewed_at'] %}viewed{% endif %}">{{ article['title'] }}</a></td>
@@ -78,6 +48,8 @@
         </table>
       </div>
 {% endblock %}
+
+
 {% block extension_for_js %}
     <script type="text/javascript">
       /* 

@@ -6,6 +6,7 @@ from werkzeug.exceptions import abort
 from henryviii.controller.auth import login_required
 from henryviii.model import current_user
 from henryviii.model import (
+    article as model_article, 
     off_account as model_off_account, 
     off_account_follow as model_off_account_follow, 
     off_account_user_category as model_off_account_user_category, 
@@ -48,6 +49,19 @@ def index_controller():
                             user_category_with_off_accounts=
                                 model_off_account_user_category.get_dict_of_user_category_with_following_off_account(g.user["username"]))
 
+
+
+@bp.route('/<int:id>/show')
+@login_required
+def off_account_show(id):
+    articles = model_article.get_all_article_by_user_filter(
+        g.user["username"],
+        {
+            "off_account_id": id
+        },
+        page_size=50, page=0)
+    # current_app.logger.debug(articles)
+    return render_template('off_accounts/page.html', articles=articles)
 
 """
 Below is the api part of the controller

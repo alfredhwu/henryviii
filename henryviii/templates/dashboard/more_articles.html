@@ -1,15 +1,21 @@
           {% for article in articles %}
-            <tr>
+            <tr aid="{{ article['id'] }}">
               <td id="icon-for-{{ article['id'] }}">{% if article['viewed_at'] %}<i class="bi bi-envelope-paper"></i>{% else %}<i class="bi bi-envelope-fill"></i>{% endif %}</td>
               <td>{{ article['off_account_name'] }}</td>
               <td>{% if article['user_category'] %}{{ article['user_category'] }}{% else %}其他{% endif %}</td>
               <td>{{ article['updated_at'] }}</td>
-              <td><a href="#" link="{{ article['link'] }}" class="off_account_article {% if article['viewed_at'] %}viewed{% endif %}" aid="{{ article['id'] }}">{{ article['title'] }}</a></td>
+              <td><a href="#" link="{{ article['link'] }}" class="off-account-article {% if article['viewed_at'] %}viewed{% endif %}">{{ article['title'] }}</a></td>
               <td>
-                <input type="checkbox">
+                {% if article['liked_at'] %}
+                <a href="#" class="off-account-article-like" toggle-action="cancel"><i class="bi bi-star-fill"></i></a>
+                {% else %}
+                <a href="#" class="off-account-article-like" toggle-action="like"><i class="bi bi-star"></i></a>
+                {% endif %}
               </td>
               <td>
-                <a href="#"><i class="bi bi-trash"></i></a>
+                {% if not article['deleted_at'] %}
+                <a href="#" class="off-account-article-delete"><i class="bi bi-trash"></i></a>
+                {% endif %}
               </td>
             </tr>
           {% endfor %}

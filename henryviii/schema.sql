@@ -55,3 +55,23 @@ CREATE TABLE off_account_article_viewed (
   updated_at DATETIME NOT NULL,
   UNIQUE(off_account_article_id, username)
 );
+
+
+## table change for article viewed/liked/deleted
+
+CREATE TABLE off_account_article_user_meta (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  off_account_article_id INTEGER NOT NULL,
+  username TEXT NOT NULL,
+  viewed_at DATETIME,
+  archived_at DATETIME,
+  liked_at DATETIME,
+  disliked_at DATETIME,
+  deleted_at DATETIME,
+  UNIQUE(off_account_article_id, username)
+);
+
+INSERT INTO off_account_article_user_meta (id, off_account_article_id, username, viewed_at) 
+ SELECT id, off_account_article_id, username, updated_at FROM off_account_article_viewed;
+
+ALTER TABLE off_account_article_viewed RENAME TO off_account_article_viewed_depreciated;
