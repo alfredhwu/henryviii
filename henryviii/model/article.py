@@ -69,6 +69,7 @@ def get_all_article_by_user_filter(username, user_filter, page_size, page=0):
         ' OFFSET ?',
         (username, page_size, page_size * page)
     ).fetchall()
+    # current_app.logger.debug(f"page_size: { page_size }, page: { page }")
     return articles
 
 def get_datetime_from_filter_sql(datetime_from):

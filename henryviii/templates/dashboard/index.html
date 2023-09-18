@@ -84,7 +84,7 @@
         var window_height = $(window).height(); // height of the browser window (visible); need to set <!DOCTYPE html> at top of the page, otherwise not working
         // msg = "scrollPos: " + scrollPos + "\ndocument height:" + document_height + "\n window height: " + window_height
         // $(".off_account_article").text(msg)
-        if (scrollPos >= document_height - window_height) {
+        if (scrollPos == document_height - window_height) {
           // calculate scroll page parameters
           var article_container = $("#article-container");
           var scroll_page_size = parseInt(article_container.attr("scroll-page-size"));
@@ -93,7 +93,7 @@
           const queryString = window.location.search;
           call_link = "/more/article/" + scroll_page_size + '/' + scroll_page + queryString;
           $.get(call_link, function(data, status) {
-            // alert(data);
+            alert(data);
             article_container.append(data);
             article_container.attr("scroll-page", scroll_page)
           })
