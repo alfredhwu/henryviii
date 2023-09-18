@@ -142,7 +142,8 @@
         /*
           当打开一个文章
         */
-        $("a.off_account_article").click(function(e) {
+        $(document).on("click", "a.off_account_article", function(e) {
+        // $("a.off_account_article").click(function(e) {
           e.preventDefault();
           var article_id = $(this).attr("aid");
           if (article_id) {
