@@ -79,7 +79,7 @@ def sync_file_to_db(filepath):
         db.execute(
             'INSERT INTO off_account_list (name, category, article_updated_at, registered_at)'
             ' VALUES (?, ?, ?, ?)',
-            (current_name, current_category, current_updated_at.strftime('%Y-%m-%d %X'), current_registered_at)
+            (current_name, current_category, current_updated_at.strftime('%Y-%m-%d %X') if current_updated_at else None, current_registered_at)
         )
         off_accounts_names[current_name] = current_updated_at
     db.commit()
