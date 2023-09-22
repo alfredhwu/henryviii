@@ -51,15 +51,27 @@ def sync_file_to_db(filepath):
 
     ## iterate uploded file
     for index, row in pd.read_excel(xlsxname, sheet_name="list").iterrows():
-        current_registered_at = int(row["登记时间"]) ## timestamp to check
+        """
+        1) new entry, insert new (not in the list)
+        2) existing entry with registered_at later than record, pass
+        3) existing entry with registered_at before current record, update
+        """
         current_name = row["公众号"].strip()
+        current_category = row["分类"]
+
         if isinstance(row["更新时间"], pd.Timestamp):
             # current_updated_at = row["更新时间"].strftime('%Y-%m-%d %X')
             current_updated_at = row["更新时间"]
         else:
             current_updated_at = None
 
-        current_category = row["分类"]
+        # current_app.logger.debug(pd.isnull(row["登记时间"]))
+        current_registered_at = pd.Timestamp.now().timestamp() if pd.isnull(row["登记时间"]) else int(row["登记时间"]) 
+        # if row["登记时间"]:
+        #     current_registered_at = int(row["登记时间"]) 
+        # else: 
+        #     current_registered_at = pd.Timestamp.now().timestamp()
+
         ## if registered before or already in the list
         # if current_registered_at < last_off_account_timestamp or current_name in off_accounts_names:
         if current_name in off_accounts_names:
@@ -74,14 +86,15 @@ def sync_file_to_db(filepath):
                         ' WHERE name = ?',
                         (current_updated_at.strftime('%Y-%m-%d %X'), current_name))
             continue
-
-        ## insert the new off account to the DB
-        db.execute(
-            'INSERT INTO off_account_list (name, category, article_updated_at, registered_at)'
-            ' VALUES (?, ?, ?, ?)',
-            (current_name, current_category, current_updated_at.strftime('%Y-%m-%d %X') if current_updated_at else None, current_registered_at)
-        )
-        off_accounts_names[current_name] = current_updated_at
+        else:
+            ## insert the new off account to the DB
+            db.execute(
+                'INSERT INTO off_account_list (name, category, article_updated_at, registered_at)'
+                ' VALUES (?, ?, ?, ?)',
+                (current_name, current_category, current_updated_at.strftime('%Y-%m-%d %X') if current_updated_at else None, current_registered_at)
+            )
+            off_accounts_names[current_name] = current_updated_at
+    ## commit the changes
     db.commit()
 
     ## sync off_account articles
