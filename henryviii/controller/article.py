@@ -14,6 +14,14 @@ from henryviii.model import (
 from henryviii.db import get_db
 from datetime import date, datetime
 
+
+__FILTER_USER_CATEGORY__    = "uc"
+__FILTER_VIEW_STATUS__      = "view"
+__FILTER_FAVORITE_STATUS__  = "fav"
+__FILTER_ARCHIVE_STATUS__   = "arc"
+__FILTER_DATE_FROM__        = "dtf"
+__FILTER_DATE_TO__          = "dtt"
+
 bp = Blueprint('article', __name__)
 
 @bp.before_app_request
@@ -73,15 +81,64 @@ def view(id):
 @bp.route('/article/liked')
 @login_required
 def index_controller():
+
+    # get off_account dictionary
+    off_account_dict = model_off_account_user_category.get_dict_of_user_category_with_following_off_account(g.user["username"])
+
+    dash_filter = get_dash_filter()
+    current_app.logger.debug(dash_filter)
+
+    # articles = model_article.get_all_article_by_user_filter(
+    #     g.user["username"],
+    #     {
+    #         "favorite_status": model_filter.__STATUS_FAVORITE__
+    #     },
+    #     page_size=50, page=0)
     articles = model_article.get_all_article_by_user_filter(
         g.user["username"],
-        {
-            "favorite_status": model_filter.__STATUS_FAVORITE__
-        },
+        dash_filter,
         page_size=50, page=0)
     # current_app.logger.debug(articles)
-    return render_template("off_accounts/page.html", articles=articles)
+    return render_template("off_accounts/page.html", 
+        off_account_dict=off_account_dict, 
+        dash_filter=dash_filter,
+        articles=articles,
+        status_map={
+            "view": {
+                model_filter.__STATUS_ALL__: "全部", 
+                model_filter.__STATUS_VIEWED__: "已读", 
+                model_filter.__STATUS_NOT_VIEWED__: "未读"
+            }
+        })
 
+
+@bp.route('/article/liked/more/article/<int:page_size>/<int:page>')
+@login_required
+def render_article(page_size, page):
+    ## with dash_filter
+    dash_filter = get_dash_filter()
+    current_app.logger.debug(dash_filter)
+    ## with pagination 
+    # dash_filter["page_size"] = request.args.get("size", 50, type=int)
+    # dash_filter["page"] = request.args.get("page", 0, type=int)
+
+    articles = model_article.get_all_article_by_user_filter(
+        g.user["username"],
+        dash_filter,
+        page_size=page_size, page=page)
+    return render_template('dashboard/more_articles.html', articles=articles)
+
+
+def get_dash_filter():
+    dash_filter = {}
+    dash_filter["user_category"] = model_filter.parse("user_category", request.args.get(__FILTER_USER_CATEGORY__, "", type=str))
+    dash_filter["view_status"] = model_filter.parse("view_status", request.args.get(__FILTER_VIEW_STATUS__, type=int))
+    dash_filter["favorite_status"] = model_filter.__STATUS_FAVORITE__
+    # dash_filter["favorite_status"] = model_filter.parse("favorite_status", request.args.get(__FILTER_FAVORITE_STATUS__, type=int))
+    dash_filter["archive_status"] = model_filter.parse("archive_status", request.args.get(__FILTER_ARCHIVE_STATUS__, type=int))
+    dash_filter["date_from"] = model_filter.parse("date_from", request.args.get(__FILTER_DATE_FROM__, "", type=str))
+    dash_filter["date_to"] = model_filter.parse("date_to", request.args.get(__FILTER_DATE_TO__, "", type=str))
+    return dash_filter
 
 @bp.route('/article/<int:id>/like', methods=['POST'])
 @login_required

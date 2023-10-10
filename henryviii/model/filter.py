@@ -55,7 +55,7 @@ def get_filter_user_category(user_category):
 	return user_category_list if len(user_category_list) > 0 else None
 
 ## filter date
-def get_filter_date_from(date_str, days_ago=7):
+def get_filter_date_from(date_str, days_ago=30):
 	"""
 	Get the normalized date_from from date_str
 	:param date_str: 20230915
