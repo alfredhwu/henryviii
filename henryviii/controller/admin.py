@@ -58,12 +58,16 @@ def sync_file_to_db(filepath):
         """
         current_name = row["公众号"].strip()
         current_category = row["分类"]
+        row_updated_at = row["更新时间"]
 
-        if isinstance(row["更新时间"], pd.Timestamp):
+        current_updated_at = None
+        if isinstance(row_updated_at, datetime):
             # current_updated_at = row["更新时间"].strftime('%Y-%m-%d %X')
-            current_updated_at = row["更新时间"]
+            current_updated_at = row_updated_at
+            
         else:
-            current_updated_at = None
+            if not pd.isnull(row_updated_at):
+                current_updated_at = datetime.strptime(row_updated_at, '%Y年%m月%d日 %H:%M')
 
         # current_app.logger.debug(pd.isnull(row["登记时间"]))
         current_registered_at = pd.Timestamp.now().timestamp() if pd.isnull(row["登记时间"]) else int(row["登记时间"]) 
@@ -117,11 +121,17 @@ def sync_file_to_db(filepath):
         current_registered_at = int(row["登记时间"])
         current_off_account_name = row["公众号"].strip()
         current_article_title = row["标题"].strip()
-        if isinstance(row["日期"], pd.Timestamp):
+
+        current_updated_at = None
+        if isinstance(row["日期"], datetime):
             current_updated_at = row["日期"].strftime('%Y-%m-%d %X')
         else:
-            current_updated_at = None
+            if row["日期"] is not None:
+                current_updated_at = row["日期"].replace('年', '-').replace('月', '-').replace('日', '')
+        
         current_content = row["内容"].strip()
+
+        current_app.logger.info(f"{current_article_title} @ {current_updated_at}")
 
         ## if current_registered_at earlier than the DB record, pass
         if current_registered_at < last_off_account_timestamp:
@@ -132,9 +142,16 @@ def sync_file_to_db(filepath):
             "SELECT * FROM off_account_article WHERE link='" + current_link + "'"
         ).fetchone()
         if find_article_by_link is not None:
+            # db.execute(
+            #     'UPDATE off_account_article'
+            #     ' SET updated_at = ?'
+            #     ' WHERE link = ?',
+            #     (current_updated_at, current_link)
+            # )
             continue
 
         ## insert the new article to DB
+        current_app.logger.info(f"{current_article_title} inserted")
         db.execute(
             'INSERT INTO off_account_article (off_account_name, title, updated_at, content, link, registered_at)'
             ' VALUES (?, ?, ?, ?, ?, ?)',
