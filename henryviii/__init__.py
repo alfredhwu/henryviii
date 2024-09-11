@@ -40,7 +40,7 @@ def create_app(test_config=None):
     db.init_app(app)
 
     from .controller import auth, account, admin, article, off_account, user_category, dashboard
-
+    from .controller.api import api_article
 
     app.register_blueprint(auth.bp, url_prefix='/auth')
     app.register_blueprint(account.bp, url_prefix='/account')
@@ -49,6 +49,7 @@ def create_app(test_config=None):
     app.register_blueprint(user_category.bp, url_prefix='/user-category')
     app.register_blueprint(article.bp)
     app.register_blueprint(dashboard.bp)
+    app.register_blueprint(api_article.bp, url_prefix="/api")
 
     app.add_url_rule('/', endpoint='index')
 

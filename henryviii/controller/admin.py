@@ -151,7 +151,7 @@ def sync_file_to_db(filepath):
             continue
 
         ## insert the new article to DB
-        current_app.logger.info(f"{current_article_title} inserted")
+        # current_app.logger.info(f"{current_article_title} inserted")
         db.execute(
             'INSERT INTO off_account_article (off_account_name, title, updated_at, content, link, registered_at)'
             ' VALUES (?, ?, ?, ?, ?, ?)',
