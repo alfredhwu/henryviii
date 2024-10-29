@@ -11,7 +11,9 @@ CREATE TABLE off_account_list (
   name TEXT UNIQUE NOT NULL,
   category TEXT,
   article_updated_at DATETIME,
-  registered_at INTEGER
+  registered_at INTEGER,
+  update_to_date BOOLEAN, 
+  last_updated_article TEXT
 );
 
 
