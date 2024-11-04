@@ -163,13 +163,13 @@ mixed-port: 7890
 
 # Set to true to allow connections to the local-end server from
 # other LAN IP addresses
-# allow-lan: false
+allow-lan: true
 
 # This is only applicable when `allow-lan` is `true`
 # '*': bind all IP addresses
 # 192.168.122.11: bind a single IPv4 address
 # "[aaaa::a8aa:ff:fe09:57d8]": bind a single IPv6 address
-# bind-address: '*'
+bind-address: '*'
 
 # Clash router working mode
 # rule: rule-based packet routing
@@ -183,7 +183,7 @@ mode: rule
 log-level: warning
 
 # When set to false, resolver won't translate hostnames to IPv6 addresses
-# ipv6: false
+# ipv6: true
 
 # RESTful web API listening address
 external-controller: 127.0.0.1:9090
@@ -227,11 +227,13 @@ external-controller: 127.0.0.1:9090
 dns:
   enable: true
   listen: 0.0.0.0:53
-  # ipv6: false # when the false, response to AAAA questions will be empty
+  ipv6: true # when the false, response to AAAA questions will be empty
 
   # These nameservers are used to resolve the DNS nameserver hostnames below.
   # Specify IP addresses only
   default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
     - 114.114.114.114
     - 8.8.8.8
   enhanced-mode: fake-ip
@@ -253,18 +255,24 @@ dns:
   nameserver:
     # - 114.114.114.114 # default value
     # - 8.8.8.8 # default value
-    - 119.29.29.29
-    - 223.5.5.5
-    - tls://dns.rubyfish.cn:853 # DNS over TLS
-    - https://1.1.1.1/dns-query # DNS over HTTPS
-    - dhcp://en0 # dns from dhcp
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+    # - 119.29.29.29
+    # - 223.5.5.5
+    # - tls://dns.rubyfish.cn:853 # DNS over TLS
+    # - https://1.1.1.1/dns-query # DNS over HTTPS
+    # - dhcp://en0 # dns from dhcp
     # - '8.8.8.8#en0'
 
   # When `fallback` is present, the DNS server will send concurrent requests
   # to the servers in this section along with servers in `nameservers`.
   # The answers from fallback servers are used when the GEOIP country
   # is not `CN`.
-  # fallback:
+  fallback:
+    - https://doh.dns.sb/dns-query
+    - https://dns.cloudflare.com/dns-query
+    - https://dns.twnic.tw/dns-query
+    - tls://8.8.4.4:853
   #   - tcp://1.1.1.1
   #   - 'tcp://1.1.1.1#en0'
 
@@ -279,11 +287,12 @@ dns:
   # are always used if not match `fallback-filter.ipcidr`.
   #
   # This is a countermeasure against DNS pollution attacks.
-  # fallback-filter:
-  #   geoip: true
+  fallback-filter:
+    geoip: true
   #   geoip-code: CN
-  #   ipcidr:
-  #     - 240.0.0.0/4
+    ipcidr:
+      - 240.0.0.0/4
+      - 0.0.0.0/32
   #   domain:
   #     - '+.google.com'
   #     - '+.facebook.com'
